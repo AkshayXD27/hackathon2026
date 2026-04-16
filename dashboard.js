@@ -2,7 +2,7 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-const AI_API_KEY = "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";
+const AI_API_KEY = "vck_5ipRm2krp7pplL6oKfo4fiZPNTOgIq50IoP66onmrIEz2PM8rh12xVp4";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Top Level State
