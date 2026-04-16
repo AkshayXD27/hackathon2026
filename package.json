@@ -1,0 +1,12 @@
+{
+  "name": "eatzy-app",
+  "version": "1.0.0",
+  "description": "Eatzy Group Food Engine",
+  "main": "api/engine.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "mongodb": "^6.5.0"
+  }
+}
