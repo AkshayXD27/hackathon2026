@@ -69,10 +69,11 @@ CRITICAL RULES:
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "openrouter/elephant-alpha",
+        "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+        "temperature": 0.9,
         "messages": [
           { "role": "system", "content": systemPrompt },
-          { "role": "user", "content": "Surprise me!" }
+          { "role": "user", "content": `Surprise me! Make it wildly different from any past suggestion. Random seed: ${Date.now()}` }
         ]
       })
     });

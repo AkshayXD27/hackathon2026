@@ -71,7 +71,8 @@ ${recentFoodsContext || "No recent foods logged."}`;
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "openrouter/elephant-alpha",
+        "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+        "temperature": 0.8,
         "messages": [
           { "role": "system", "content": systemPrompt },
           { "role": "user", "content": prompt }
