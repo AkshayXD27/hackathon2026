@@ -2,6 +2,8 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
+const AI_API_KEY = "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";
+
 document.addEventListener("DOMContentLoaded", () => {
     // Top Level State
     let currentUser = null;
