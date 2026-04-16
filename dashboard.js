@@ -212,7 +212,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const snap = await getDoc(sessionRef);
             const data = snap.data();
             data.inputs = data.inputs || {};
-            data.inputs[currentUser.uid] = { cravings, budget };
+            data.inputs[currentUser.uid] = { 
+                cravings, 
+                budget,
+                username: currentProfile.username,
+                dietType: currentProfile.dietType || "None",
+                allergies: currentProfile.allergies || []
+            };
             await updateDoc(sessionRef, { inputs: data.inputs });
 
             btn.style.display = 'none';
@@ -237,20 +243,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Engine: Trigger Eatzy Engine (Called only by host) via secure Vercel backend
     async function triggerEatzyEngine(sessionData) {
         try {
-            // 1. Gather Profiles
-            const memberProfiles = {};
-            for (const uid of Object.keys(sessionData.members)) {
-                const snap = await getDoc(doc(db, "users", uid));
-                if (snap.exists()) memberProfiles[uid] = snap.data();
-            }
-
-            // 2. Build AI Prompt (System instructions moved to backend)
+            // 1. Build AI Prompt using self-reported profiles in inputs (bypasses users collection read permissions)
             let prompt = "GROUP DATA:\n";
 
             for (const uid of Object.keys(sessionData.members)) {
-                const profile = memberProfiles[uid];
                 const vibe = sessionData.inputs[uid];
-                prompt += `- ${profile.username} | Diet: ${profile.dietType} | Allergies: ${profile.allergies.join(", ")} | Cravings right now: ${vibe.cravings} | Max Budget: ${vibe.budget}\n`;
+                if (vibe) {
+                    prompt += `- ${vibe.username || "Unknown"} | Diet: ${vibe.dietType || "None"} | Allergies: ${(vibe.allergies || []).join(", ")} | Cravings right now: ${vibe.cravings} | Max Budget: ${vibe.budget}\n`;
+                }
             }
 
             // 3. Make API Call to your secure Vercel backend endpoint
@@ -262,7 +262,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ prompt: prompt })
             });
 
-            if (!response.ok) throw new Error("Backend API failed");
+            if (!response.ok) {
+                const errData = await response.text();
+                throw new Error(`Backend API failed (${response.status}): ${errData}`);
+            }
 
             const aiData = await response.json();
             const verdict = aiData.choices[0].message.content;
@@ -274,11 +277,11 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         } catch (error) {
-            console.error("Venice Engine Error:", error);
-            // Fallback just in case
+            console.error("Eatzy Engine Error:", error);
+            // Show the actual error to debug
             await updateDoc(doc(db, "sessions", currentSessionPin), {
                 state: "result",
-                resultText: "Eatzy Engine hiccuped! But a local wood-fired Pizza place usually covers all bases."
+                resultText: `Eatzy Engine Error: ${error.message || error}`
             });
         }
     }
