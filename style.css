@@ -54,6 +54,7 @@ body {
   align-items: center;
   gap: 0.8rem;
   cursor: pointer;
+  margin-right: 3rem;
 }
 
 .logo-icon {

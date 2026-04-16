@@ -137,10 +137,20 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSaveBudget.style.display = 'none';
     });
 
-    userCurrency.addEventListener('change', () => {
+    userCurrency.addEventListener('change', async () => {
+        globalCurrency = userCurrency.value;
         if(globalBudget) {
-            globalCurrency = userCurrency.value;
             budgetPill.textContent = "Budget: " + globalCurrency + globalBudget;
+        }
+        // Save to Firebase on select change naturally
+        try {
+            if (currentUser) {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    globalCurrency: globalCurrency
+                });
+            }
+        } catch (err) {
+            console.error("Currency save error:", err);
         }
     });
 
@@ -381,6 +391,15 @@ document.addEventListener("DOMContentLoaded", () => {
         isHost = false;
         document.getElementById('join-form').style.display = 'none';
         document.getElementById('pin-input').value = "";
+        
+        // Reset the Lock In Button to fix the 'Saving...' stuck bug
+        const btnLock = document.getElementById('btn-lock-in');
+        btnLock.innerText = "Lock In Choice";
+        btnLock.disabled = false;
+        btnLock.style.display = 'block';
+        document.getElementById('lock-waiting-msg').style.display = 'none';
+        document.getElementById('craving-input').value = "";
+
         showSection(sPersonalDashboard);
     });
 
