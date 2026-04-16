@@ -37,7 +37,7 @@ body {
 }
 
 /* Base styling for elements that use white backgrounds matching the app container */
-.logo-icon, .hero-image img, .card img {
+.logo-icon, .hero-image img, .hero-image video, .card img {
   mix-blend-mode: multiply;
 }
 
@@ -254,12 +254,11 @@ body {
   z-index: 1;
 }
 
-.hero-image img {
+.hero-image img, .hero-image video {
   width: 140%;
   max-width: 800px;
-  margin-right: -150px;
+  margin-right: -220px;
   margin-top: -80px;
-  animation: float 8s ease-in-out infinite;
   filter: drop-shadow(0 30px 40px rgba(0,0,0,0.1));
 }
 
@@ -320,7 +319,7 @@ body {
     left: auto;
   }
   
-  .hero-image img {
+  .hero-image img, .hero-image video {
     margin: 0;
     width: 100%;
     max-width: 600px;

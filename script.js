@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
             signupFields.style.display = 'none';
         } else {
             modalTitle.textContent = 'Create Account';
-            modalSubtitle.textContent = 'Sign up for EatsNow';
+            modalSubtitle.textContent = 'Sign up for Eatzy';
             submitBtn.textContent = 'Sign Up';
             toggleText.textContent = "Already have an account?";
             toggleLink.textContent = 'Log In';
