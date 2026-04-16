@@ -31,8 +31,7 @@ CRITICAL RULES:
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        // Staying with Gemma but disabling the heavy 2-step reasoning for blazing fast speed
-        "model": "google/gemma-4-26b-a4b-it:free",
+        "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
         "messages": [
           { "role": "system", "content": systemPrompt },
           { "role": "user", "content": prompt }
