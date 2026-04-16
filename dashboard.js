@@ -2,8 +2,6 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-const AI_API_KEY = "vck_5ipRm2krp7pplL6oKfo4fiZPNTOgIq50IoP66onmrIEz2PM8rh12xVp4";
-
 document.addEventListener("DOMContentLoaded", () => {
     // Top Level State
     let currentUser = null;
@@ -29,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     onAuthStateChanged(auth, async (user) => {
-        if (!user || (!user.emailVerified && false)) { // Temporarily relaxing emailVerified during hackathon testing might be wise, but keeping true to previous logic:
+        if (!user || (!user.emailVerified && false)) { // Temporarily relaxing emailVerified during hackathon testing
             if (!user) { window.location.href = 'index.html'; return; }
         }
 
@@ -236,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showSection(sWelcome);
     });
 
-    // Engine: Trigger Venice AI (Called only by host)
+    // Engine: Trigger Venice AI (Called only by host) via secure Vercel backend
     async function triggerVeniceAI(sessionData) {
         try {
             // 1. Gather Profiles
@@ -256,25 +254,16 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             prompt += "\nSelect exactly one meal idea/cuisine. Deliver the final verdict directly.";
 
-            // 3. Make API Call natively compatible with OpenRouter given the sk-or-v1 key format
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            // 3. Make API Call to your secure Vercel backend endpoint
+            const response = await fetch("/api/engine", {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${AI_API_KEY}`,
-                    "Content-Type": "application/json",
-                    "HTTP-Referer": window.location.href, // Required by OpenRouter
-                    "X-Title": "Eatzy App"
+                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    model: "openrouter/auto",
-                    messages: [
-                        { role: "system", content: "You are the Eatzy engine. Return only the final restaurant/cuisine recommendation." },
-                        { role: "user", content: prompt }
-                    ]
-                })
+                body: JSON.stringify({ prompt: prompt })
             });
 
-            if (!response.ok) throw new Error("API failed");
+            if (!response.ok) throw new Error("Backend API failed");
 
             const aiData = await response.json();
             const verdict = aiData.choices[0].message.content;
