@@ -62,57 +62,27 @@ CRITICAL RULES:
 3. FORMAT: Provide exactly one specific recommendation, returned ONLY as a valid JSON object matching this schema:
 { "foodName": "Crispy Tofu Tacos", "explanation": "A punchy 1-sentence hype explanation exactly why it fits them." }`;
 
-    const modelsToTry = [
-        "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-        "minimax/minimax-m2.5:free",
-        "meta-llama/llama-3.3-70b-instruct:free",
-        "qwen/qwen3-coder:free",
-        "z-ai/glm-4.5-air:free"
-    ];
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "model": "openrouter/elephant-alpha",
+        "temperature": 0.9,
+        "messages": [
+          { "role": "system", "content": systemPrompt },
+          { "role": "user", "content": `Surprise me! Make it wildly different from any past suggestion. Random seed: ${Date.now()}` }
+        ]
+      })
+    });
 
-    let result = null;
-    let lastError = null;
-
-    for (const model of modelsToTry) {
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json"
-              },
-              signal: controller.signal,
-              body: JSON.stringify({
-                "model": model,
-                "temperature": 0.9,
-                "messages": [
-                  { "role": "system", "content": systemPrompt },
-                  { "role": "user", "content": `Surprise me! Make it wildly different from any past suggestion. Random seed: ${Date.now()}` }
-                ]
-              })
-            });
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`Model ${model} failed with ${response.status}: ${errText}`);
-            }
-
-            result = await response.json();
-            break; // Success, exit fallback loop
-        } catch (e) {
-            console.warn(`Personal Engine Fallback Triggered: ${e.message}`);
-            lastError = e;
-            continue;
-        }
+    if (!response.ok) {
+      throw new Error(`OpenRouter API failed: ${response.status} - ${await response.text()}`);
     }
 
-    if (!result) {
-        throw new Error(`OpenRouter API completely failed after exhausting fallbacks: ${lastError?.message}`);
-    }
+    const result = await response.json();
     let aiText = result.choices[0].message.content;
     let verdict = {};
     
