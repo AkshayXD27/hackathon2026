@@ -1,47 +1,98 @@
 export default async function handler(req, res) {
-  // Allow only POST requests (since we are sending prompt data)
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
-  // Extract the LLM prompt sent securely from our dashboard.js
-  const { prompt } = req.body;
-  if (!prompt) {
-    return res.status(400).json({ error: 'Prompt is required' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    // We proxy the request natively to OpenRouter behind the scenes,
-    // safely utilizing your Vercel Environment Variable "ai_api".
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: "No prompt provided" });
+    }
+
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: "API key not configured" });
+    }
+
+    // First API call with reasoning
+    const response1 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        // Vercel maps configured environment variables to process.env locally/in-cloud
-        "Authorization": `Bearer ${process.env.ai_api || process.env.AI_API}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://eatzy.vercel.app",
-        "X-Title": "Eatzy Backend Server"
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openrouter/auto",
-        messages: [
-          { role: "system", content: "You are the Eatzy engine. Return only the final restaurant/cuisine recommendation." },
-          { role: "user", content: prompt }
-        ]
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the 'Eatzy Group Food Engine'. Your goal is to rapidly find a perfect common dinner recommendation that maximizes group satisfaction based on the friends' constraints and desires. Provide a clean, specific recommendation and a 2-sentence explanation of why it works for everyone. Do not output markdown, just clean text."
+          },
+          {
+            "role": "user",
+            "content": prompt
+          }
+        ],
+        "reasoning": {"enabled": true}
       })
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.status}`);
+    if (!response1.ok) {
+        const errorText = await response1.text();
+        console.error("OpenRouter API Error (Call 1):", errorText);
+        throw new Error(`OpenRouter API failed on first call: ${response1.status}`);
     }
 
-    // Get the exact JSON block returned by OpenRouter and send it directly 
-    // back to the frontend without exposing the API key to the client!
-    const data = await response.json();
-    return res.status(200).json(data);
+    const result1 = await response1.json();
+    const assistantMessage = result1.choices[0].message;
+
+    // Second API call - model continues reasoning from where it left off
+    const messages = [
+        {
+          "role": "system",
+          "content": "You are the 'Eatzy Group Food Engine'. Your goal is to rapidly find a perfect common dinner recommendation that maximizes group satisfaction based on the friends' constraints and desires. Provide a clean, specific recommendation and a 2-sentence explanation of why it works for everyone. Do not output markdown, just clean text."
+        },
+        {
+          "role": "user",
+          "content": prompt
+        },
+        {
+          "role": "assistant",
+          "content": assistantMessage.content,
+          "reasoning_details": assistantMessage.reasoning_details // Pass back unmodified
+        },
+        {
+          "role": "user",
+          "content": "Are you sure? Think carefully. Output ONLY the specific final recommendation and a short concluding paragraph so it looks great on the UI. No markdown."
+        }
+    ];
+
+    const response2 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "messages": messages
+      })
+    });
+
+    if (!response2.ok) {
+        const errorText = await response2.text();
+        console.error("OpenRouter API Error (Call 2):", errorText);
+        throw new Error(`OpenRouter API failed on second call: ${response2.status}`);
+    }
+
+    const finalResult = await response2.json();
+    
+    // Return the final choices back to the client
+    return res.status(200).json(finalResult);
 
   } catch (error) {
-    console.error("Vercel Engine API Error:", error);
-    return res.status(500).json({ error: 'Failed to process backend AI request' });
+    console.error("Engine handler error:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 }

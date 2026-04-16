@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (memberCount === inputCount && memberCount > 0) {
                         // Everyone locked in -> move to calculating
                         await updateDoc(doc(db, "sessions", pin), { state: "calculating" });
-                        triggerVeniceAI(data); // Host runs the engine
+                        triggerEatzyEngine(data); // Host runs the engine
                     }
                 }
             }
@@ -234,8 +234,8 @@ document.addEventListener("DOMContentLoaded", () => {
         showSection(sWelcome);
     });
 
-    // Engine: Trigger Venice AI (Called only by host) via secure Vercel backend
-    async function triggerVeniceAI(sessionData) {
+    // Engine: Trigger Eatzy Engine (Called only by host) via secure Vercel backend
+    async function triggerEatzyEngine(sessionData) {
         try {
             // 1. Gather Profiles
             const memberProfiles = {};
@@ -244,15 +244,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (snap.exists()) memberProfiles[uid] = snap.data();
             }
 
-            // 2. Build AI Prompt
-            let prompt = "You are the 'Eatzy Group Food Engine'. Your goal is to rapidly find a perfect common dinner recommendation that maximizes group satisfaction based on the following friends' constraints and desires. Provide a clean, specific recommendation and a 2 sentence explanation of why it works for everyone. Do not output markdown, just clean text.\n\nGROUP DATA:\n";
+            // 2. Build AI Prompt (System instructions moved to backend)
+            let prompt = "GROUP DATA:\n";
 
             for (const uid of Object.keys(sessionData.members)) {
                 const profile = memberProfiles[uid];
                 const vibe = sessionData.inputs[uid];
                 prompt += `- ${profile.username} | Diet: ${profile.dietType} | Allergies: ${profile.allergies.join(", ")} | Cravings right now: ${vibe.cravings} | Max Budget: ${vibe.budget}\n`;
             }
-            prompt += "\nSelect exactly one meal idea/cuisine. Deliver the final verdict directly.";
 
             // 3. Make API Call to your secure Vercel backend endpoint
             const response = await fetch("/api/engine", {
