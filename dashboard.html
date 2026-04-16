@@ -78,6 +78,36 @@
                         <p id="food-loading" style="color: var(--text-gray);">Loading...</p>
                     </ul>
                 </div>
+                <div style="margin-top: 3rem; text-align: center; border-top: 1px solid #eaeaea; padding-top: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Can't Decide? Let the Wheel Choose!</h3>
+                    
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;" id="wheel-items-list">
+                            <!-- Tags go here -->
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem;">
+                            <input type="text" id="wheel-input" placeholder="Options (e.g. KFC)" style="padding: 0.8rem; border-radius: 8px; border: 1.5px solid #eaeaea; font-family: inherit;">
+                            <button id="btn-add-wheel" class="cta-btn" style="padding: 0.8rem 1.5rem; border-radius: 8px;">Add Option</button>
+                        </div>
+                        
+                        <div id="wheel-container" style="position: relative; width: 250px; height: 250px; border-radius: 50%; border: 4px solid var(--primary-color); overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--white); box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin: 1rem 0;">
+                            <!-- pointer -->
+                            <div style="position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid var(--text-dark); z-index: 10;"></div>
+                            
+                            <div id="wheel" style="width: 100%; height: 100%; border-radius: 50%; transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1); display: flex; align-items: center; justify-content: center; background: conic-gradient(#fce8dd 0deg, #fce8dd 360deg);">
+                             <!-- pure visual, managed by JS -->
+                            </div>
+                        </div>
+                        
+                        <p id="wheel-result-msg" style="color: var(--primary-color); font-weight: bold; font-size: 1.4rem; height: 2rem;"></p>
+                        
+                        <div style="display: flex; gap: 1rem;">
+                            <button id="btn-spin-wheel" class="cta-btn">Spin Handfully!</button>
+                            <button id="btn-surprise-me" class="login-btn" style="background-color: var(--text-dark); box-shadow: none;">Surprise Me (AI)</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Welcome View (Eatzy Engine Landing) -->
@@ -113,7 +143,8 @@
             <!-- Input State -->
             <div id="input-section" style="display: none; text-align: center; max-width: 500px; margin: 0 auto; width: 100%;">
                 <h2 style="font-size: 2rem;">Quick Vibe Check</h2>
-                <p style="color: var(--text-gray); margin-bottom: 2rem;">Under 60 seconds! What are you feeling?</p>
+                <h1 id="countdown-timer" style="font-size: 3rem; color: #e74c3c; margin: 0.5rem 0; font-weight: 800;">60</h1>
+                <p style="color: var(--text-gray); margin-bottom: 2rem;">Seconds to lock in! What are you feeling?</p>
                 
                 <div style="background: var(--white); padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: left;">
                     <div class="input-group" style="margin-bottom: 2rem;">

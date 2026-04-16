@@ -54,12 +54,11 @@ module.exports = async function handler(req, res) {
     const systemPrompt = `You are the 'Eatzy Group Food Engine'. Your goal is to rapidly find a perfect common dinner recommendation that maximizes group satisfaction based on the friends' constraints.
 
 CRITICAL RULES:
-1. NO COMPROMISE PLACES: If two people want conflicting things (like Sushi and Ramen), DO NOT suggest a "place that serves both". You must make a hard, definitive choice of exactly ONE cuisine or dish that satisfies the overarching constraints.
-2. HEALTH MATTERS: When breaking ties between cravings, heavily favor the option that is objectively healthier.
-3. ABSOLUTE DEALBREAKERS: Dietary restrictions and allergies are absolute. A recommendation MUST NOT violate them.
-4. BUDGET LIMITS: The recommendation must fit within the lowest budget constraint in the group.
-5. REPEAT AVOIDANCE: Review the recently eaten foods below. You MUST absolutely skip and avoid recommending foods that the group members have already eaten recently.
-6. FORMAT: Provide your response EXACTLY as a valid JSON object matching this schema, with no markdown wrappers or extra text:
+1. CONFLICT RESOLVER: If preferences clash heavily (e.g. one wants spicy, one hates spicy; or one wants burgers, one wants light food), you MUST suggest a compromise dish or restaurant type (like a mild dish with optional spicy addons, or an establishment serving both hearty meals and robust salads).
+2. HARD ALLERGY SAFETY NET: You are protecting their health. Filters for allergies or strict diets (vegan, gluten-free, nut-free, etc.) are ABSOLUTE. You must fatally reject any choice that even risks violating these requirements.
+3. BUDGET LIMITS: The recommendation must fit within the lowest budget constraint in the group.
+4. REPEAT AVOIDANCE: Review the recently eaten foods below. You MUST absolutely skip and avoid recommending foods that the group members have already eaten recently.
+5. FORMAT: Provide your response EXACTLY as a valid JSON object matching this schema, with no markdown wrappers or extra text:
 { "foodName": "Spicy Tuna Sushi", "explanation": "Punchy 2-sentence explanation exactly why it was chosen based on their health, budget, and diets." }
 
 RECENT FOODS FROM GROUP:

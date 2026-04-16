@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let sessionUnsubscribe = null;
     let globalBudget = null;
     let globalCurrency = "$";
+    let timerInterval = null;
 
     // DOM Elements
     const sWelcome = document.getElementById('welcome-section');
@@ -232,6 +233,123 @@ document.addEventListener("DOMContentLoaded", () => {
         btnLogFood.innerText = "Log Food";
     });
 
+    // Wheel Logic (Home)
+    const wheelInput = document.getElementById('wheel-input');
+    const btnAddWheel = document.getElementById('btn-add-wheel');
+    const wheelItemsList = document.getElementById('wheel-items-list');
+    const btnSpinWheel = document.getElementById('btn-spin-wheel');
+    const btnSurpriseMe = document.getElementById('btn-surprise-me');
+    const wheelElement = document.getElementById('wheel');
+    const wheelResultMsg = document.getElementById('wheel-result-msg');
+    
+    let wItems = ["Pizza", "Burgers", "Sushi", "Salad", "Tacos"];
+    let currentRotation = 0;
+
+    function renderWheelTags() {
+        if(!wheelItemsList) return;
+        wheelItemsList.innerHTML = "";
+        wItems.forEach((it, idx) => {
+            const span = document.createElement('span');
+            span.style.background = `hsl(${(idx * 360) / wItems.length}, 70%, 85%)`;
+            span.style.padding = '0.3rem 0.8rem';
+            span.style.borderRadius = '15px';
+            span.style.fontSize = '0.9rem';
+            span.style.color = "var(--text-dark)";
+            span.style.fontWeight = "600";
+            span.innerText = it;
+            
+            const del = document.createElement('span');
+            del.innerText = " ×";
+            del.style.cursor = "pointer";
+            del.onclick = () => { wItems.splice(idx, 1); renderWheelTags(); };
+            span.appendChild(del);
+            
+            wheelItemsList.appendChild(span);
+        });
+
+        // Update wheel gradient
+        if(wItems.length > 0) {
+            let grad = [];
+            let slice = 360 / wItems.length;
+            for(let i=0; i<wItems.length; i++){
+                let color = `hsl(${(i * 360) / wItems.length}, 70%, 85%)`;
+                grad.push(`${color} ${i*slice}deg ${(i+1)*slice}deg`);
+            }
+            if(wheelElement) wheelElement.style.background = `conic-gradient(${grad.join(", ")})`;
+        } else {
+            if(wheelElement) wheelElement.style.background = "#ccc";
+        }
+    }
+    
+    btnAddWheel?.addEventListener('click', () => {
+        if(wheelInput.value.trim() && wItems.length < 15) {
+            wItems.push(wheelInput.value.trim());
+            wheelInput.value = "";
+            renderWheelTags();
+        }
+    });
+
+    btnSpinWheel?.addEventListener('click', () => {
+        if(wItems.length === 0) return;
+        btnSpinWheel.disabled = true;
+        wheelResultMsg.innerText = "Spinning...";
+        wheelResultMsg.style.color = "var(--text-gray)";
+        
+        const spins = Math.floor(Math.random() * 5) + 5; // 5 to 9 full spins
+        const slice = 360 / wItems.length;
+        const randomDegree = Math.floor(Math.random() * 360);
+        
+        currentRotation += (spins * 360) + randomDegree;
+        wheelElement.style.transform = `rotate(${currentRotation}deg)`;
+        
+        setTimeout(() => {
+            // Calculate winner
+            let actualRot = currentRotation % 360;
+            let pointingPhase = (360 - actualRot) % 360;
+            let winningIndex = Math.floor(pointingPhase / slice);
+            
+            wheelResultMsg.style.color = "var(--primary-color)";
+            wheelResultMsg.innerText = `Landed on: ${wItems[winningIndex]}! 🎉`;
+            btnSpinWheel.disabled = false;
+        }, 4000);
+    });
+
+    if(wheelItemsList) renderWheelTags();
+
+    // Personal AI Surprise Hook
+    btnSurpriseMe?.addEventListener('click', async () => {
+        if(!currentUser) return;
+        btnSurpriseMe.disabled = true;
+        btnSurpriseMe.innerText = "Asking AI...";
+        wheelResultMsg.innerText = "AI is looking at your history...";
+        wheelResultMsg.style.color = "var(--text-gray)";
+        try {
+            const res = await fetch("/api/personalEngine", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    uid: currentUser.uid,
+                    username: currentProfile.username,
+                    budget: globalBudget ? `${globalCurrency}${globalBudget}` : "Moderate",
+                    dietType: currentProfile.dietType || "None",
+                    allergies: currentProfile.allergies || []
+                })
+            });
+            const data = await res.json();
+            if(res.ok && data.verdict) {
+                wheelResultMsg.style.color = "var(--primary-color)";
+                wheelResultMsg.innerText = `AI Says: ${data.verdict.foodName}!\n${data.verdict.explanation}`;
+            } else {
+                wheelResultMsg.innerText = "AI couldn't decide!";
+            }
+        } catch(e) {
+            console.error(e);
+            wheelResultMsg.innerText = "Error contacting AI.";
+        }
+        btnSurpriseMe.disabled = false;
+        btnSurpriseMe.innerText = "Surprise Me (AI)";
+    });
+
     // 1. Create Group
     document.getElementById('btn-create-group').addEventListener('click', async () => {
         const pin = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit PIN
@@ -325,9 +443,30 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.state === "input") {
                 showSection(sInput);
 
+                const btnLock = document.getElementById('btn-lock-in');
+                const elTimer = document.getElementById('countdown-timer');
+
+                // Timer Logic
+                if (!timerInterval && data.inputStartTime) {
+                    timerInterval = setInterval(() => {
+                        const elapsed = Math.floor((Date.now() - data.inputStartTime) / 1000);
+                        let left = 60 - elapsed;
+                        if (left < 0) left = 0;
+                        if (elTimer) elTimer.innerText = left;
+                        
+                        if (left === 0) {
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                            if (btnLock && !btnLock.disabled) {
+                                btnLock.click();
+                            }
+                        }
+                    }, 1000);
+                }
+
                 // If I already submitted, show waiting msg
-                if (data.inputs[currentUser.uid]) {
-                    document.getElementById('btn-lock-in').style.display = 'none';
+                if (data.inputs && data.inputs[currentUser.uid]) {
+                    btnLock.style.display = 'none';
                     document.getElementById('lock-waiting-msg').style.display = 'block';
                 } else {
                     document.getElementById('btn-lock-in').style.display = 'block';
@@ -362,7 +501,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Lobby: Start Engine (Host only)
     document.getElementById('btn-start-engine').addEventListener('click', async () => {
         if (isHost && currentSessionPin) {
-            await updateDoc(doc(db, "sessions", currentSessionPin), { state: "input" });
+            await updateDoc(doc(db, "sessions", currentSessionPin), { 
+                state: "input",
+                inputStartTime: Date.now() 
+            });
         }
     });
 
@@ -410,6 +552,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Start Over
     document.getElementById('btn-new-decision').addEventListener('click', () => {
         if (sessionUnsubscribe) sessionUnsubscribe();
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        
         currentSessionPin = null;
         isHost = false;
         document.getElementById('join-form').style.display = 'none';
