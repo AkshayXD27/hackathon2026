@@ -165,13 +165,36 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.logs.forEach(log => {
                     const li = document.createElement('li');
                     li.className = 'member-item';
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
                     const d = new Date(log.date_unix * 1000);
                     const formattedTime = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                     // Basic heuristic for today/yesterday display
                     const dateDesc = log.date_unix > (Date.now()/1000 - 86400) ? "Today" : "Yesterday";
                     
-                    li.innerHTML = `<span>${log.food}</span> <span class="status">${dateDesc} at ${formattedTime}</span>`;
+                    li.innerHTML = `
+                        <div>
+                            <span style="font-weight: 700; color: var(--primary-color);">${log.food}</span>
+                            <span class="status" style="margin-left: 0.5rem; color: #999;">${dateDesc} at ${formattedTime}</span>
+                        </div>
+                        <button class="delete-log-btn" data-id="${log._id}" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; transition: transform 0.2s;" title="Delete Log">❌</button>
+                    `;
                     foodList.appendChild(li);
+                });
+
+                // Attach delete listeners
+                document.querySelectorAll('.delete-log-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const logId = e.currentTarget.getAttribute('data-id');
+                        e.currentTarget.style.opacity = '0.5';
+                        try {
+                            const res = await fetch(`/api/logFood?id=${logId}`, { method: "DELETE" });
+                            if (res.ok) fetchFoods();
+                        } catch (err) {
+                            console.error("Delete failed", err);
+                            e.currentTarget.style.opacity = '1';
+                        }
+                    });
                 });
             } else {
                 foodList.innerHTML = `<p style="color: var(--text-gray);">No foods logged yet.</p>`;
@@ -408,8 +431,10 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             // 1. Build AI Prompt using self-reported profiles in inputs (bypasses users collection read permissions)
             let prompt = "GROUP DATA:\n";
+            let membersMap = {};
 
             for (const uid of Object.keys(sessionData.members)) {
+                membersMap[uid] = sessionData.members[uid].name || "Unknown";
                 const vibe = sessionData.inputs[uid];
                 if (vibe) {
                     prompt += `- ${vibe.username || "Unknown"} | Diet: ${vibe.dietType || "None"} | Allergies: ${(vibe.allergies || []).join(", ")} | Cravings right now: ${vibe.cravings} | Max Budget: ${vibe.budget}\n`;
@@ -422,7 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ prompt: prompt })
+                body: JSON.stringify({ prompt: prompt, membersMap: membersMap })
             });
 
             if (!response.ok) {
@@ -431,12 +456,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const aiData = await response.json();
-            const verdict = aiData.choices[0].message.content;
+            const verdictObj = aiData.verdict || { foodName: "Error", explanation: "Failed to generate." };
+            const finalVerdict = `🏆 ${verdictObj.foodName} 🏆\n\n${verdictObj.explanation}`;
 
             // 4. Update Session Result
             await updateDoc(doc(db, "sessions", currentSessionPin), {
                 state: "result",
-                resultText: verdict
+                resultText: finalVerdict
             });
 
         } catch (error) {
