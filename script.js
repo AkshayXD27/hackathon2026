@@ -7,8 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const elementsToReveal = [
         document.querySelector('.hero-content h1'),
         document.querySelector('.hero-content p'),
-        document.querySelector('.cta-btn'),
-        ...document.querySelectorAll('.card')
+        document.querySelector('.cta-btn')
     ];
 
     elementsToReveal.forEach((el, index) => {
@@ -23,42 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             el.style.opacity = '1';
             el.style.transform = 'translateY(0)';
-            if (el.classList.contains('card')) {
-                setTimeout(() => {
-                    el.style.transition = '';
-                }, 800 + index * 100);
-            }
         }, 100);
-    });
-
-    // 3D Tilt Effect on Cards
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = ((y - centerY) / centerY) * -15;
-            const rotateY = ((x - centerX) / centerX) * 15;
-
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-12px) scale(1.05)`;
-            card.style.transition = `transform 0.1s ease`;
-            card.style.zIndex = '20';
-            card.style.boxShadow = `0 30px 60px rgba(0,0,0,0.12), ${-rotateY}px ${rotateX}px 20px rgba(250, 140, 53, 0.1)`;
-        });
-
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)`;
-            card.style.transition = `transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease`;
-            card.style.zIndex = '3';
-            card.style.boxShadow = `0 20px 45px rgba(0,0,0,0.08)`;
-            if (card.classList.contains('card-birthday')) {
-                card.style.zIndex = '1';
-            }
-        });
     });
 
     // 2. Modal Overlay Logic

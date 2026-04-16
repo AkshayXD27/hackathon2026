@@ -184,67 +184,6 @@ body {
   background-color: var(--primary-hover);
 }
 
-/* Floating feature cards */
-.feature-cards {
-  position: relative;
-  margin-top: 140px;
-  height: 140px; 
-}
-
-.card {
-  position: absolute;
-  background: var(--white);
-  padding: 1.5rem;
-  border-radius: 28px;
-  box-shadow: 0 20px 45px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 150px;
-  height: 150px;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 3;
-  will-change: transform;
-}
-
-.card:hover {
-  transform: translateY(-12px) scale(1.03);
-  z-index: 10;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.12);
-}
-
-.card img {
-  width: 65px;
-  height: 65px;
-  object-fit: contain;
-  margin-bottom: 0.8rem;
-}
-
-.card span {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-gray);
-  line-height: 1.3;
-}
-
-.card-priority {
-  bottom: 0px;
-  left: -40px;
-}
-
-.card-exclusive {
-  bottom: -30px;
-  left: 120px;
-}
-
-.card-birthday {
-  bottom: 60px;
-  left: 260px;
-  z-index: 1;
-}
-
 /* Hero Image */
 .hero-image {
   flex: 1;
@@ -304,21 +243,6 @@ body {
     margin: 0 auto 2.5rem;
   }
   
-  .feature-cards {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 4rem;
-    position: relative;
-    height: auto;
-  }
-  
-  .card {
-    position: relative;
-    bottom: auto;
-    left: auto;
-  }
-  
   .hero-image img, .hero-image video {
     margin: 0;
     width: 100%;
@@ -339,10 +263,6 @@ body {
     font-size: 2.5rem;
   }
   
-  .feature-cards {
-    flex-direction: column;
-    align-items: center;
-  }
 }
 
 /* Modal Styles */
