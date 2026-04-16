@@ -86,8 +86,6 @@ ${recentFoodsContext || "No recent foods logged."}`;
               body: JSON.stringify({
                 "model": model,
                 "temperature": 0.8,
-                "max_tokens": 250,
-                "response_format": { type: "json_object" },
                 "messages": [
                   { "role": "system", "content": systemPrompt },
                   { "role": "user", "content": prompt }
