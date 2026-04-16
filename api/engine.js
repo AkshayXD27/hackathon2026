@@ -31,7 +31,7 @@ CRITICAL RULES:
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+        "model": "openrouter/elephant-alpha",
         "messages": [
           { "role": "system", "content": systemPrompt },
           { "role": "user", "content": prompt }
@@ -40,9 +40,9 @@ CRITICAL RULES:
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        console.error("OpenRouter API Error:", errorText);
-        throw new Error(`OpenRouter API failed: ${response.status}`);
+      const errorText = await response.text();
+      console.error("OpenRouter API Error:", errorText);
+      throw new Error(`OpenRouter API failed: ${response.status}`);
     }
 
     const result = await response.json();
