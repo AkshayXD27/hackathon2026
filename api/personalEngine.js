@@ -84,6 +84,8 @@ CRITICAL RULES:
               body: JSON.stringify({
                 "model": model,
                 "temperature": 0.9,
+                "max_tokens": 150,
+                "response_format": { type: "json_object" },
                 "messages": [
                   { "role": "system", "content": systemPrompt },
                   { "role": "user", "content": `Surprise me! Make it wildly different from any past suggestion. Random seed: ${Date.now()}` }
