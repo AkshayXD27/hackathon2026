@@ -64,27 +64,52 @@ CRITICAL RULES:
 RECENT FOODS FROM GROUP:
 ${recentFoodsContext || "No recent foods logged."}`;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-        "temperature": 0.8,
-        "messages": [
-          { "role": "system", "content": systemPrompt },
-          { "role": "user", "content": prompt }
-        ]
-      })
-    });
+    const modelsToTry = [
+        "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+        "minimax/minimax-m2.5:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "qwen/qwen3-coder:free",
+        "z-ai/glm-4.5-air:free"
+    ];
 
-    if (!response.ok) {
-      throw new Error(`OpenRouter API failed: ${response.status} - ${await response.text()}`);
+    let result = null;
+    let lastError = null;
+
+    for (const model of modelsToTry) {
+        try {
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                "model": model,
+                "temperature": 0.8,
+                "messages": [
+                  { "role": "system", "content": systemPrompt },
+                  { "role": "user", "content": prompt }
+                ]
+              })
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`Model ${model} failed with ${response.status}: ${errText}`);
+            }
+
+            result = await response.json();
+            break; // Engine success, exit fallback loop
+        } catch (e) {
+            console.warn(`Engine Fallback Triggered: ${e.message}`);
+            lastError = e;
+            continue;
+        }
     }
 
-    const result = await response.json();
+    if (!result) {
+        throw new Error(`OpenRouter API utterly failed after exhausting 5 fallbacks. Last error: ${lastError?.message}`);
+    }
     let aiText = result.choices[0].message.content;
     let verdict = {};
     
