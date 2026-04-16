@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,9 +15,17 @@
             padding: 4rem 2rem;
             min-height: 60vh;
         }
-        
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         .member-item {
             padding: 1rem;
             background: #fdf5f0;
@@ -27,9 +36,15 @@
             display: flex;
             justify-content: space-between;
         }
-        .member-item span.status { font-weight: 400; color: var(--text-gray); font-size: 0.9rem; }
+
+        .member-item span.status {
+            font-weight: 400;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
     </style>
 </head>
+
 <body>
     <div class="app-container">
         <nav class="navbar" id="main-nav">
@@ -41,70 +56,96 @@
                 <li><a href="#" id="link-home" class="active">Home</a></li>
                 <li><a href="#" id="link-engine">Eatzy Engine</a></li>
             </ul>
-            <div class="budget-controller" style="display: flex; gap: 0.5rem; align-items: center; margin-right: 1.5rem; margin-left: auto;">
-                <select id="user-currency" style="padding: 0.5rem; border-radius: 8px; border: 1.5px solid #eaeaea; outline: none;">
+            <div class="budget-controller"
+                style="display: flex; gap: 0.5rem; align-items: center; margin-right: 1.5rem; margin-left: auto;">
+                <select id="user-currency"
+                    style="padding: 0.5rem; border-radius: 8px; border: 1.5px solid #eaeaea; outline: none;">
                     <option value="$">USD ($)</option>
                     <option value="€">EUR (€)</option>
                     <option value="₹">INR (₹)</option>
                 </select>
-                <div id="budget-pill" class="budget-pill warning" style="padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; background: rgba(231, 76, 60, 0.1); color: #e74c3c;">Set Budget (Warning)</div>
-                <input type="number" id="budget-input" placeholder="e.g. 50" style="display: none; width: 80px; padding: 0.5rem; border-radius: 8px; border: 1.5px solid #eaeaea;">
-                <button id="btn-save-budget" style="display: none; padding: 0.5rem 1rem; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; font-weight: 600;">Save</button>
+                <div id="budget-pill" class="budget-pill warning"
+                    style="padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; background: rgba(231, 76, 60, 0.1); color: #e74c3c;">
+                    Set Budget (Warning)</div>
+                <input type="number" id="budget-input" placeholder="e.g. 50"
+                    style="display: none; width: 80px; padding: 0.5rem; border-radius: 8px; border: 1.5px solid #eaeaea;">
+                <button id="btn-save-budget"
+                    style="display: none; padding: 0.5rem 1rem; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; font-weight: 600;">Save</button>
             </div>
-            <button class="login-btn" id="logout-btn" style="background-color: var(--error, #e74c3c); box-shadow: none;">Log Out</button>
+            <button class="login-btn" id="logout-btn"
+                style="background-color: var(--error, #e74c3c); box-shadow: none;">Log Out</button>
         </nav>
 
         <main class="dashboard-container" id="dashboard-content" style="display: none;">
-            
+
             <!-- Personal Dashboard View (New Default) -->
-            <div id="personal-dashboard-section" style="display: none; width: 100%; max-width: 800px; margin: 0 auto; text-align: left;">
-                <h1 id="pd-welcome-message" style="font-size: 2.5rem; color: var(--text-dark); margin-bottom: 2rem;">Loading...</h1>
-                
-                <div style="background: var(--white); padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+            <div id="personal-dashboard-section"
+                style="display: none; width: 100%; max-width: 800px; margin: 0 auto; text-align: left;">
+                <h1 id="pd-welcome-message" style="font-size: 2.5rem; color: var(--text-dark); margin-bottom: 2rem;">
+                    Loading...</h1>
+
+                <div
+                    style="background: var(--white); padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 2rem;">
                     <h3 style="margin-bottom: 1rem;">Log New Food</h3>
                     <div style="display: flex; gap: 1rem; align-items: stretch; flex-wrap: wrap;">
-                        <input type="text" id="food-input" placeholder="e.g., 2 slices of Pizza" style="flex: 1; padding: 1rem; border-radius: 12px; border: 1.5px solid #eaeaea; font-family: inherit; font-size: 1rem; outline: none; min-width: 250px;">
-                        <select id="food-day" style="padding: 1rem; border-radius: 12px; border: 1.5px solid #eaeaea; font-family: inherit; font-size: 1rem; outline: none; background: var(--white);">
+                        <input type="text" id="food-input" placeholder="e.g., 2 slices of Pizza"
+                            style="flex: 1; padding: 1rem; border-radius: 12px; border: 1.5px solid #eaeaea; font-family: inherit; font-size: 1rem; outline: none; min-width: 250px;">
+                        <select id="food-day"
+                            style="padding: 1rem; border-radius: 12px; border: 1.5px solid #eaeaea; font-family: inherit; font-size: 1rem; outline: none; background: var(--white);">
                             <option value="0">Today</option>
                             <option value="-1">Yesterday</option>
                         </select>
-                        <button id="btn-log-food" class="cta-btn" style="padding: 0 2rem; white-space: nowrap;">Log Food</button>
+                        <button id="btn-log-food" class="cta-btn" style="padding: 0 2rem; white-space: nowrap;">Log
+                            Food</button>
                     </div>
                 </div>
 
-                <div style="background: var(--white); padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">Recent Logs</h3>
-                    <ul id="food-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1rem;">
+                <div
+                    style="background: var(--white); padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">Recent
+                        Logs</h3>
+                    <ul id="food-list"
+                        style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1rem;">
                         <p id="food-loading" style="color: var(--text-gray);">Loading...</p>
                     </ul>
                 </div>
                 <div style="margin-top: 3rem; text-align: center; border-top: 1px solid #eaeaea; padding-top: 2rem;">
                     <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">Can't Decide? Let the Wheel Choose!</h3>
-                    
+
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;" id="wheel-items-list">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;"
+                            id="wheel-items-list">
                             <!-- Tags go here -->
                         </div>
-                        
+
                         <div style="display: flex; gap: 1rem;">
-                            <input type="text" id="wheel-input" placeholder="Options (e.g. KFC)" style="padding: 0.8rem; border-radius: 8px; border: 1.5px solid #eaeaea; font-family: inherit;">
-                            <button id="btn-add-wheel" class="cta-btn" style="padding: 0.8rem 1.5rem; border-radius: 8px;">Add Option</button>
+                            <input type="text" id="wheel-input" placeholder="Options (e.g. KFC)"
+                                style="padding: 0.8rem; border-radius: 8px; border: 1.5px solid #eaeaea; font-family: inherit;">
+                            <button id="btn-add-wheel" class="cta-btn"
+                                style="padding: 0.8rem 1.5rem; border-radius: 8px;">Add Option</button>
                         </div>
-                        
-                        <div id="wheel-container" style="position: relative; width: 250px; height: 250px; border-radius: 50%; border: 4px solid var(--primary-color); overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--white); box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin: 1rem 0;">
+
+                        <div id="wheel-container"
+                            style="position: relative; width: 250px; height: 250px; border-radius: 50%; border: 4px solid var(--primary-color); overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--white); box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin: 1rem 0;">
                             <!-- pointer -->
-                            <div style="position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid var(--text-dark); z-index: 10;"></div>
-                            
-                            <div id="wheel" style="width: 100%; height: 100%; border-radius: 50%; transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1); display: flex; align-items: center; justify-content: center; background: conic-gradient(#fce8dd 0deg, #fce8dd 360deg);">
-                             <!-- pure visual, managed by JS -->
+                            <div
+                                style="position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid var(--text-dark); z-index: 10;">
+                            </div>
+
+                            <div id="wheel"
+                                style="width: 100%; height: 100%; border-radius: 50%; transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1); display: flex; align-items: center; justify-content: center; background: conic-gradient(#fce8dd 0deg, #fce8dd 360deg);">
+                                <!-- pure visual, managed by JS -->
                             </div>
                         </div>
-                        
-                        <p id="wheel-result-msg" style="color: var(--primary-color); font-weight: bold; font-size: 1.4rem; min-height: 2rem; margin-bottom: 1.5rem;"></p>
-                        
+
+                        <p id="wheel-result-msg"
+                            style="color: var(--primary-color); font-weight: bold; font-size: 1.4rem; min-height: 2rem; margin-bottom: 1.5rem;">
+                        </p>
+
                         <div style="display: flex; gap: 1rem;">
                             <button id="btn-spin-wheel" class="cta-btn">Spin Handfully!</button>
-                            <button id="btn-surprise-me" class="login-btn" style="background-color: var(--text-dark); box-shadow: none;">Surprise Me (AI)</button>
+                            <button id="btn-surprise-me" class="login-btn"
+                                style="background-color: var(--text-dark); box-shadow: none;">Surprise Me (AI)</button>
                         </div>
                     </div>
                 </div>
@@ -112,61 +153,87 @@
 
             <!-- Welcome View (Eatzy Engine Landing) -->
             <div id="welcome-section" style="display: none;">
-                <div style="display: flex; width: 100%; max-width: 1100px; margin: 0 auto; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
-                    
+                <div
+                    style="display: flex; width: 100%; max-width: 1100px; margin: 0 auto; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
+
                     <!-- Left Content -->
                     <div style="flex: 1; text-align: left; min-width: 350px;">
-                        <h1 id="welcome-message" style="font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1rem; line-height: 1.1;">Group Engine</h1>
-                        <p style="color: var(--text-gray); font-size: 1.2rem; margin-bottom: 2rem;">Stop arguing, start eating. Build a multiplayer session below and let the AI resolve your conflicts.</p>
-                        
+                        <h1 id="welcome-message"
+                            style="font-size: 3.5rem; color: var(--text-dark); margin-bottom: 1rem; line-height: 1.1;">
+                            Group Engine</h1>
+                        <p style="color: var(--text-gray); font-size: 1.2rem; margin-bottom: 2rem;">Stop arguing, start
+                            eating. Build a multiplayer session below and let the AI resolve your conflicts.</p>
+
                         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                             <button class="cta-btn" id="btn-create-group">Create Group (Host)</button>
-                            <button class="login-btn" id="btn-show-join" style="background-color: var(--white); color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none;">Join by PIN</button>
+                            <button class="login-btn" id="btn-show-join"
+                                style="background-color: var(--white); color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none;">Join
+                                by PIN</button>
                         </div>
-                        
+
                         <div id="join-form" style="display: none; margin-top: 2.5rem;">
-                            <input type="text" id="pin-input" placeholder="Enter PIN" style="padding: 1rem; border-radius: 12px; border: 1.5px solid #eaeaea; font-size: 1.2rem; width: 150px; text-align: center; text-transform: uppercase;">
-                            <button class="cta-btn" id="btn-join-submit" style="padding: 1rem 2rem; margin-left: 0.5rem;">Join</button>
+                            <input type="text" id="pin-input" placeholder="Enter PIN"
+                                style="padding: 1rem; border-radius: 12px; border: 1.5px solid #eaeaea; font-size: 1.2rem; width: 150px; text-align: center; text-transform: uppercase;">
+                            <button class="cta-btn" id="btn-join-submit"
+                                style="padding: 1rem 2rem; margin-left: 0.5rem;">Join</button>
                             <p id="join-error" class="error-msg" style="display: none;"></p>
                         </div>
                     </div>
 
                     <!-- Right Content (Spline) -->
                     <div style="flex: 1.2; min-width: 350px; position: relative;">
-                        <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.84/build/spline-viewer.js"></script>
-                        <spline-viewer url="https://prod.spline.design/XZPkRInIFm90e7ix/scene.splinecode" style="width: 100%; height: 500px; border-radius: 20px; outline: none;"></spline-viewer>
+                        <script type="module"
+                            src="https://unpkg.com/@splinetool/viewer@1.12.84/build/spline-viewer.js"></script>
+                        <spline-viewer
+                            url="https://prod.spline.design/XZPkRInIFm90e7ix/scene.splinecode"></spline-viewer>
                     </div>
 
                 </div>
             </div>
 
             <!-- Lobby State -->
-            <div id="lobby-section" style="display: none; text-align: center; max-width: 600px; margin: 0 auto; width: 100%;">
-                <h2 style="font-size: 2rem;">Group Lobby: <span id="lobby-pin" style="color: var(--primary-color); letter-spacing: 2px;"></span></h2>
-                <div style="background: var(--white); padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-top: 1.5rem; text-align: left;">
-                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">Members in Party</h3>
-                    <ul id="member-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.8rem;">
+            <div id="lobby-section"
+                style="display: none; text-align: center; max-width: 600px; margin: 0 auto; width: 100%;">
+                <h2 style="font-size: 2rem;">Group Lobby: <span id="lobby-pin"
+                        style="color: var(--primary-color); letter-spacing: 2px;"></span></h2>
+                <div
+                    style="background: var(--white); padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-top: 1.5rem; text-align: left;">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">Members in
+                        Party</h3>
+                    <ul id="member-list"
+                        style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.8rem;">
                         <!-- dynamic members -->
                     </ul>
                 </div>
-                <button class="cta-btn" id="btn-start-engine" style="margin-top: 2rem; width: 100%; display: none;">Start Engine</button>
-                <p id="host-waiting-msg" style="margin-top: 2rem; color: var(--text-gray); display: none; font-weight: 500;">Waiting for Host to start...</p>
+                <button class="cta-btn" id="btn-start-engine"
+                    style="margin-top: 2rem; width: 100%; display: none;">Start Engine</button>
+                <p id="host-waiting-msg"
+                    style="margin-top: 2rem; color: var(--text-gray); display: none; font-weight: 500;">Waiting for Host
+                    to start...</p>
             </div>
 
             <!-- Input State -->
-            <div id="input-section" style="display: none; text-align: center; max-width: 500px; margin: 0 auto; width: 100%;">
+            <div id="input-section"
+                style="display: none; text-align: center; max-width: 500px; margin: 0 auto; width: 100%;">
                 <h2 style="font-size: 2rem;">Quick Vibe Check</h2>
-                <h1 id="countdown-timer" style="font-size: 3rem; color: #e74c3c; margin: 0.5rem 0; font-weight: 800;">60</h1>
+                <h1 id="countdown-timer" style="font-size: 3rem; color: #e74c3c; margin: 0.5rem 0; font-weight: 800;">60
+                </h1>
                 <p style="color: var(--text-gray); margin-bottom: 2rem;">Seconds to lock in! What are you feeling?</p>
-                
-                <div style="background: var(--white); padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: left;">
+
+                <div
+                    style="background: var(--white); padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: left;">
                     <div class="input-group" style="margin-bottom: 2rem;">
-                        <label style="font-weight: 600; margin-bottom: 0.8rem; display: block; color: var(--text-dark);">Specific Cravings?</label>
-                        <input type="text" id="craving-input" placeholder="e.g. Spicy, Sushi, Burgers, Healthy..." style="width: 100%; padding: 1.2rem; border-radius: 12px; border: 1.5px solid #eaeaea; outline: none; font-family: inherit;">
+                        <label
+                            style="font-weight: 600; margin-bottom: 0.8rem; display: block; color: var(--text-dark);">Specific
+                            Cravings?</label>
+                        <input type="text" id="craving-input" placeholder="e.g. Spicy, Sushi, Burgers, Healthy..."
+                            style="width: 100%; padding: 1.2rem; border-radius: 12px; border: 1.5px solid #eaeaea; outline: none; font-family: inherit;">
                     </div>
-                    
+
                     <div class="input-group">
-                        <label style="font-weight: 600; margin-bottom: 0.8rem; display: block; color: var(--text-dark);">Max Budget Today</label>
+                        <label
+                            style="font-weight: 600; margin-bottom: 0.8rem; display: block; color: var(--text-dark);">Max
+                            Budget Today</label>
                         <div class="radio-group" style="display: flex; gap: 1rem;">
                             <label><input type="radio" name="budget" value="Budget" checked> $ (Budget)</label>
                             <label><input type="radio" name="budget" value="Moderate"> $$ (Moderate)</label>
@@ -174,34 +241,44 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <button class="cta-btn" id="btn-lock-in" style="margin-top: 2rem; width: 100%;">Lock In Choice</button>
-                <p id="lock-waiting-msg" style="margin-top: 1.5rem; color: var(--primary-color); font-weight: 600; display: none;">Waiting for others to lock in...</p>
+                <p id="lock-waiting-msg"
+                    style="margin-top: 1.5rem; color: var(--primary-color); font-weight: 600; display: none;">Waiting
+                    for others to lock in...</p>
             </div>
 
             <!-- Calculating State -->
             <div id="calculating-section" style="display: none; text-align: center; margin-top: 4rem;">
                 <h2 style="color: var(--primary-color); font-size: 2.5rem;">Eatzy AI is thinking...</h2>
-                <p style="color: var(--text-gray); margin-top: 1rem;">Blending allergies, diets, budgets, and cravings...</p>
-                <div class="loader" style="margin: 3rem auto; border: 6px solid #fce8dd; border-top: 6px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+                <p style="color: var(--text-gray); margin-top: 1rem;">Blending allergies, diets, budgets, and
+                    cravings...</p>
+                <div class="loader"
+                    style="margin: 3rem auto; border: 6px solid #fce8dd; border-top: 6px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;">
+                </div>
             </div>
 
             <!-- Results State -->
-            <div id="result-section" style="display: none; text-align: center; max-width: 600px; margin: 0 auto; width: 100%; margin-top: 2rem;">
+            <div id="result-section"
+                style="display: none; text-align: center; max-width: 600px; margin: 0 auto; width: 100%; margin-top: 2rem;">
                 <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text-dark);">The Verdict Is In!</h2>
-                <div style="background: var(--white); padding: 3rem; border-radius: 30px; box-shadow: 0 15px 40px rgba(250, 140, 53, 0.2); border: 2px solid var(--primary-color);">
-                    <h3 id="result-text" style="color: var(--primary-color); font-size: 1.6rem; font-weight: 700; line-height: 1.6;"></h3>
+                <div
+                    style="background: var(--white); padding: 3rem; border-radius: 30px; box-shadow: 0 15px 40px rgba(250, 140, 53, 0.2); border: 2px solid var(--primary-color);">
+                    <h3 id="result-text"
+                        style="color: var(--primary-color); font-size: 1.6rem; font-weight: 700; line-height: 1.6;">
+                    </h3>
                 </div>
                 <button class="login-btn" id="btn-new-decision" style="margin-top: 3rem;">Start Over</button>
             </div>
-            
+
         </main>
-        
+
         <div id="loading-spinner" style="text-align: center; margin-top: 5rem;">
             <h2 style="color: var(--text-gray);">Verifying your session...</h2>
         </div>
     </div>
-    
+
     <script type="module" src="dashboard.js"></script>
 </body>
+
 </html>
