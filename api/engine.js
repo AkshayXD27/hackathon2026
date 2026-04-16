@@ -10,9 +10,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "No prompt provided" });
     }
 
-    const apiKey = process.env.API_KEY;
+    const apiKey = process.env.AI_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: "API key not configured" });
+      return res.status(500).json({ error: "AI key not configured" });
     }
 
     // First API call with reasoning
