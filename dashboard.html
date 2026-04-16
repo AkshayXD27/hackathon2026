@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatsNow | Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 2rem;
+            text-align: center;
+            min-height: 50vh;
+        }
+        .dashboard-container h1 {
+            font-size: 3rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        .dashboard-container p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <nav class="navbar" id="main-nav">
+            <div class="logo">
+                <img src="assets/logo.png" alt="EatsNow Logo" class="logo-icon">
+                <span class="logo-text">EatsNow</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#" class="active">Dashboard</a></li>
+            </ul>
+            <button class="login-btn" id="logout-btn" style="background-color: var(--error, #e74c3c); box-shadow: none;">Log Out</button>
+        </nav>
+
+        <main class="dashboard-container" id="dashboard-content" style="display: none;">
+            <h1 id="welcome-message">Loading...</h1>
+            <p>We are customizing your menu based on your dietary preferences and health goals.</p>
+        </main>
+        
+        <div id="loading-spinner" style="text-align: center; margin-top: 5rem;">
+            <h2 style="color: var(--text-gray);">Verifying your session...</h2>
+        </div>
+    </div>
+    
+    <script type="module" src="dashboard.js"></script>
+</body>
+</html>

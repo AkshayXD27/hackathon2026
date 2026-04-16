@@ -345,3 +345,160 @@ body {
     align-items: center;
   }
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background: var(--white);
+  padding: 3rem;
+  border-radius: 30px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0);
+}
+
+.close-modal {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--text-gray);
+  transition: color 0.3s;
+}
+
+.close-modal:hover {
+  color: var(--error, #e74c3c);
+}
+
+.modal-logo {
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  cursor: default;
+}
+
+#modal-title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: var(--text-dark);
+  margin-bottom: 0.4rem;
+}
+
+#modal-subtitle {
+  text-align: center;
+  color: var(--text-gray);
+  margin-bottom: 2rem;
+}
+
+#modal-form .input-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+#modal-form label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+#modal-form input[type="email"],
+#modal-form input[type="password"],
+#modal-form input[type="text"],
+.styled-select {
+  width: 100%;
+  padding: 1rem;
+  border: 1.5px solid #eaeaea;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#modal-form input:focus, .styled-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(250, 140, 53, 0.1);
+}
+
+.radio-group, .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.radio-group label, .checkbox-group label {
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.error-msg, .success-msg {
+  font-size: 0.85rem;
+  text-align: center;
+  display: none;
+  padding: 0.8rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.error-msg { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+.success-msg { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+
+.toggle-auth {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-gray);
+}
+
+.toggle-auth a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 0.3rem;
+  transition: color 0.3s;
+}
+
+/* Custom scrollbar for modal */
+.modal-content::-webkit-scrollbar { width: 8px; }
+.modal-content::-webkit-scrollbar-track { background: transparent; }
+.modal-content::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
