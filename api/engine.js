@@ -15,81 +15,39 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: "AI key not configured" });
     }
 
-    // First API call with reasoning
-    const response1 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const systemPrompt = `You are the 'Eatzy Group Food Engine'. Your goal is to rapidly find a perfect common dinner recommendation that maximizes group satisfaction based on the friends' constraints.
+
+CRITICAL RULES:
+1. NO COMPROMISE PLACES: If two people want conflicting things (like Sushi and Ramen), DO NOT suggest a "place that serves both". You must make a hard, definitive choice of exactly ONE cuisine or dish that satisfies the overarching constraints.
+2. HEALTH MATTERS: When breaking ties between cravings, heavily favor the option that is objectively healthier.
+3. ABSOLUTE DEALBREAKERS: Dietary restrictions and allergies are absolute. A recommendation MUST NOT violate them.
+4. BUDGET LIMITS: The recommendation must fit within the lowest budget constraint in the group.
+5. FORMAT: Provide exactly one specific recommendation, followed by a punchy 2-sentence explanation of why it was chosen based on their health, budget, and diets. No markdown formatting.`;
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        // Staying with Gemma but disabling the heavy 2-step reasoning for blazing fast speed
         "model": "google/gemma-4-26b-a4b-it:free",
         "messages": [
-          {
-            "role": "system",
-            "content": "You are the 'Eatzy Group Food Engine'. Your goal is to rapidly find a perfect common dinner recommendation that maximizes group satisfaction based on the friends' constraints and desires. Provide a clean, specific recommendation and a 2-sentence explanation of why it works for everyone. Do not output markdown, just clean text."
-          },
-          {
-            "role": "user",
-            "content": prompt
-          }
-        ],
-        "reasoning": {"enabled": true}
+          { "role": "system", "content": systemPrompt },
+          { "role": "user", "content": prompt }
+        ]
       })
     });
 
-    if (!response1.ok) {
-        const errorText = await response1.text();
-        console.error("OpenRouter API Error (Call 1):", errorText);
-        throw new Error(`OpenRouter API failed on first call: ${response1.status}`);
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error("OpenRouter API Error:", errorText);
+        throw new Error(`OpenRouter API failed: ${response.status}`);
     }
 
-    const result1 = await response1.json();
-    const assistantMessage = result1.choices[0].message;
-
-    // Second API call - model continues reasoning from where it left off
-    const messages = [
-        {
-          "role": "system",
-          "content": "You are the 'Eatzy Group Food Engine'. Your goal is to rapidly find a perfect common dinner recommendation that maximizes group satisfaction based on the friends' constraints and desires. Provide a clean, specific recommendation and a 2-sentence explanation of why it works for everyone. Do not output markdown, just clean text."
-        },
-        {
-          "role": "user",
-          "content": prompt
-        },
-        {
-          "role": "assistant",
-          "content": assistantMessage.content,
-          "reasoning_details": assistantMessage.reasoning_details // Pass back unmodified
-        },
-        {
-          "role": "user",
-          "content": "Are you sure? Think carefully. Output ONLY the specific final recommendation and a short concluding paragraph so it looks great on the UI. No markdown."
-        }
-    ];
-
-    const response2 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        "model": "google/gemma-4-26b-a4b-it:free",
-        "messages": messages
-      })
-    });
-
-    if (!response2.ok) {
-        const errorText = await response2.text();
-        console.error("OpenRouter API Error (Call 2):", errorText);
-        throw new Error(`OpenRouter API failed on second call: ${response2.status}`);
-    }
-
-    const finalResult = await response2.json();
-    
-    // Return the final choices back to the client
-    return res.status(200).json(finalResult);
+    const result = await response.json();
+    return res.status(200).json(result);
 
   } catch (error) {
     console.error("Engine handler error:", error);
