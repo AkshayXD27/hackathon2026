@@ -28,8 +28,8 @@ module.exports = async function handler(req, res) {
     let unixTime = Math.floor(Date.now() / 1000);
     try {
         const timeResponse = await fetch("https://timeapi.io/api/v1/time/current/unix");
-        unixTime = await timeResponse.json(); 
-        if(typeof unixTime !== 'number') unixTime = parseInt(unixTime) || Math.floor(Date.now() / 1000);
+        const tjson = await timeResponse.json(); 
+        if (tjson && tjson.unix_timestamp) unixTime = tjson.unix_timestamp;
     } catch (apiErr) {
         console.warn("TimeAPI failed, using local server time.");
     }

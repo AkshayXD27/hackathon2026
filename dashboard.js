@@ -50,6 +50,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentUser = user;
                 welcomeMsg.textContent = `Hey, ${currentProfile.username}!`;
 
+                // Handle global budget loading
+                if (currentProfile.globalBudget) {
+                    globalBudget = currentProfile.globalBudget;
+                    globalCurrency = currentProfile.globalCurrency || "$";
+                    userCurrency.value = globalCurrency;
+                    budgetPill.textContent = "Budget: " + globalCurrency + globalBudget;
+                    budgetPill.style.background = "rgba(46, 204, 113, 0.1)";
+                    budgetPill.style.color = "#2ecc71";
+                    budgetPill.style.border = "1.5px solid rgba(46, 204, 113, 0.5)";
+                }
+
                 loadingSpinner.style.display = 'none';
                 dashboardContent.style.display = 'flex';
                 showSection(sPersonalDashboard);
@@ -63,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // View Routing
     function showSection(targetSection) {
         sWelcome.style.display = 'none';
         sPersonalDashboard.style.display = 'none';
@@ -74,6 +84,24 @@ document.addEventListener("DOMContentLoaded", () => {
         targetSection.style.display = 'block';
     }
 
+    // Top Nav Tabs
+    document.getElementById('link-home').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('link-home').classList.add('active');
+        document.getElementById('link-engine').classList.remove('active');
+        if (sessionUnsubscribe) sessionUnsubscribe();
+        currentSessionPin = null;
+        isHost = false;
+        showSection(sPersonalDashboard);
+    });
+
+    document.getElementById('link-engine').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('link-engine').classList.add('active');
+        document.getElementById('link-home').classList.remove('active');
+        showSection(sWelcome);
+    });
+
     // Budget Controller
     budgetPill.addEventListener('click', () => {
         budgetPill.style.display = 'none';
@@ -82,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         budgetInput.focus();
     });
 
-    btnSaveBudget.addEventListener('click', () => {
+    btnSaveBudget.addEventListener('click', async () => {
         const val = budgetInput.value.trim();
         if(val) {
             globalBudget = val;
@@ -91,6 +119,18 @@ document.addEventListener("DOMContentLoaded", () => {
             budgetPill.style.background = "rgba(46, 204, 113, 0.1)";
             budgetPill.style.color = "#2ecc71";
             budgetPill.style.border = "1.5px solid rgba(46, 204, 113, 0.5)";
+
+            // Save to Firebase
+            try {
+                if (currentUser) {
+                    await updateDoc(doc(db, "users", currentUser.uid), {
+                        globalBudget: globalBudget,
+                        globalCurrency: globalCurrency
+                    });
+                }
+            } catch (err) {
+                console.error("Budget save error:", err);
+            }
         }
         budgetPill.style.display = 'inline-block';
         budgetInput.style.display = 'none';
@@ -115,8 +155,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.logs.forEach(log => {
                     const li = document.createElement('li');
                     li.className = 'member-item';
+                    const d = new Date(log.date_unix * 1000);
+                    const formattedTime = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    // Basic heuristic for today/yesterday display
                     const dateDesc = log.date_unix > (Date.now()/1000 - 86400) ? "Today" : "Yesterday";
-                    li.innerHTML = `<span>${log.food}</span> <span class="status">${dateDesc}</span>`;
+                    
+                    li.innerHTML = `<span>${log.food}</span> <span class="status">${dateDesc} at ${formattedTime}</span>`;
                     foodList.appendChild(li);
                 });
             } else {
