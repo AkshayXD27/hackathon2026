@@ -2,7 +2,7 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-const AI_API_KEY = "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";
+const AI_API_KEY = "vck_5ipRm2krp7pplL6oKfo4fiZPNTOgIq50IoP66onmrIEz2PM8rh12xVp4";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Top Level State
@@ -18,11 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const sInput = document.getElementById('input-section');
     const sCalculating = document.getElementById('calculating-section');
     const sResult = document.getElementById('result-section');
-    
+
     const welcomeMsg = document.getElementById('welcome-message');
     const dashboardContent = document.getElementById('dashboard-content');
     const loadingSpinner = document.getElementById('loading-spinner');
-    
+
     // Auth & Init
     document.getElementById('logout-btn')?.addEventListener('click', async () => {
         await signOut(auth);
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     onAuthStateChanged(auth, async (user) => {
         if (!user || (!user.emailVerified && false)) { // Temporarily relaxing emailVerified during hackathon testing might be wise, but keeping true to previous logic:
-             if(!user) { window.location.href = 'index.html'; return; }
+            if (!user) { window.location.href = 'index.html'; return; }
         }
 
         try {
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentProfile = docSnap.data();
                 currentUser = user;
                 welcomeMsg.textContent = `Hey, ${currentProfile.username}!`;
-                
+
                 loadingSpinner.style.display = 'none';
                 dashboardContent.style.display = 'flex';
                 showSection(sWelcome);
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const pin = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit PIN
         currentSessionPin = pin;
         isHost = true;
-        
+
         await setDoc(doc(db, "sessions", pin), {
             hostId: currentUser.uid,
             state: "lobby",
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
             inputs: {},
             resultText: ""
         });
-        
+
         document.getElementById('lobby-pin').textContent = pin;
         listenToSession(pin);
     });
@@ -92,12 +92,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const err = document.getElementById('join-error');
         err.style.display = 'none';
 
-        if(pin.length < 4) { err.textContent = "Invalid PIN"; err.style.display = 'block'; return; }
+        if (pin.length < 4) { err.textContent = "Invalid PIN"; err.style.display = 'block'; return; }
 
         try {
             const sessionRef = doc(db, "sessions", pin);
             const snap = await getDoc(sessionRef);
-            if(!snap.exists()) {
+            if (!snap.exists()) {
                 err.textContent = "Session not found.";
                 err.style.display = 'block';
                 return;
@@ -122,19 +122,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Main Game Loop Listener
     function listenToSession(pin) {
-        if(sessionUnsubscribe) sessionUnsubscribe();
-        
+        if (sessionUnsubscribe) sessionUnsubscribe();
+
         sessionUnsubscribe = onSnapshot(doc(db, "sessions", pin), async (snap) => {
-            if(!snap.exists()) return;
+            if (!snap.exists()) return;
             const data = snap.data();
-            
+
             // State: LOBBY
-            if(data.state === "lobby") {
+            if (data.state === "lobby") {
                 showSection(sLobby);
                 const ul = document.getElementById('member-list');
                 ul.innerHTML = "";
                 const memberKeys = Object.keys(data.members);
-                
+
                 memberKeys.forEach(uid => {
                     const li = document.createElement('li');
                     li.className = 'member-item';
@@ -150,13 +150,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById('host-waiting-msg').style.display = 'block';
                 }
             }
-            
+
             // State: INPUT
-            if(data.state === "input") {
+            if (data.state === "input") {
                 showSection(sInput);
-                
+
                 // If I already submitted, show waiting msg
-                if(data.inputs[currentUser.uid]) {
+                if (data.inputs[currentUser.uid]) {
                     document.getElementById('btn-lock-in').style.display = 'none';
                     document.getElementById('lock-waiting-msg').style.display = 'block';
                 } else {
@@ -165,10 +165,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 // If Host: check if everyone submitted
-                if(isHost) {
+                if (isHost) {
                     const memberCount = Object.keys(data.members).length;
                     const inputCount = Object.keys(data.inputs || {}).length;
-                    if(memberCount === inputCount && memberCount > 0) {
+                    if (memberCount === inputCount && memberCount > 0) {
                         // Everyone locked in -> move to calculating
                         await updateDoc(doc(db, "sessions", pin), { state: "calculating" });
                         triggerVeniceAI(data); // Host runs the engine
@@ -177,12 +177,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             // State: CALCULATING
-            if(data.state === "calculating") {
+            if (data.state === "calculating") {
                 showSection(sCalculating);
             }
 
             // State: RESULT
-            if(data.state === "result") {
+            if (data.state === "result") {
                 showSection(sResult);
                 document.getElementById('result-text').innerText = data.resultText;
             }
@@ -191,14 +191,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Lobby: Start Engine (Host only)
     document.getElementById('btn-start-engine').addEventListener('click', async () => {
-        if(isHost && currentSessionPin) {
+        if (isHost && currentSessionPin) {
             await updateDoc(doc(db, "sessions", currentSessionPin), { state: "input" });
         }
     });
 
     // Input: Lock in vibe
     document.getElementById('btn-lock-in').addEventListener('click', async () => {
-        if(!currentSessionPin) return;
+        if (!currentSessionPin) return;
         const btn = document.getElementById('btn-lock-in');
         btn.innerText = "Saving...";
         btn.disabled = true;
@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const budget = document.querySelector('input[name="budget"]:checked').value;
 
         const sessionRef = doc(db, "sessions", currentSessionPin);
-        
+
         try {
             // Need transaction-like safely pushing to inputs map
             // For hackathon safely fetching and updating:
@@ -216,10 +216,10 @@ document.addEventListener("DOMContentLoaded", () => {
             data.inputs = data.inputs || {};
             data.inputs[currentUser.uid] = { cravings, budget };
             await updateDoc(sessionRef, { inputs: data.inputs });
-            
+
             btn.style.display = 'none';
             document.getElementById('lock-waiting-msg').style.display = 'block';
-        } catch(e) {
+        } catch (e) {
             console.error(e);
             btn.innerText = "Error. Try again.";
             btn.disabled = false;
@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Start Over
     document.getElementById('btn-new-decision').addEventListener('click', () => {
-        if(sessionUnsubscribe) sessionUnsubscribe();
+        if (sessionUnsubscribe) sessionUnsubscribe();
         currentSessionPin = null;
         isHost = false;
         document.getElementById('join-form').style.display = 'none';
@@ -241,15 +241,15 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             // 1. Gather Profiles
             const memberProfiles = {};
-            for(const uid of Object.keys(sessionData.members)) {
+            for (const uid of Object.keys(sessionData.members)) {
                 const snap = await getDoc(doc(db, "users", uid));
-                if(snap.exists()) memberProfiles[uid] = snap.data();
+                if (snap.exists()) memberProfiles[uid] = snap.data();
             }
 
             // 2. Build AI Prompt
             let prompt = "You are the 'Eatzy Group Food Engine'. Your goal is to rapidly find a perfect common dinner recommendation that maximizes group satisfaction based on the following friends' constraints and desires. Provide a clean, specific recommendation and a 2 sentence explanation of why it works for everyone. Do not output markdown, just clean text.\n\nGROUP DATA:\n";
-            
-            for(const uid of Object.keys(sessionData.members)) {
+
+            for (const uid of Object.keys(sessionData.members)) {
                 const profile = memberProfiles[uid];
                 const vibe = sessionData.inputs[uid];
                 prompt += `- ${profile.username} | Diet: ${profile.dietType} | Allergies: ${profile.allergies.join(", ")} | Cravings right now: ${vibe.cravings} | Max Budget: ${vibe.budget}\n`;
@@ -274,13 +274,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
             });
 
-            if(!response.ok) throw new Error("API failed");
-            
+            if (!response.ok) throw new Error("API failed");
+
             const aiData = await response.json();
             const verdict = aiData.choices[0].message.content;
 
             // 4. Update Session Result
-            await updateDoc(doc(db, "sessions", currentSessionPin), { 
+            await updateDoc(doc(db, "sessions", currentSessionPin), {
                 state: "result",
                 resultText: verdict
             });
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             console.error("Venice Engine Error:", error);
             // Fallback just in case
-            await updateDoc(doc(db, "sessions", currentSessionPin), { 
+            await updateDoc(doc(db, "sessions", currentSessionPin), {
                 state: "result",
                 resultText: "Eatzy Engine hiccuped! But a local wood-fired Pizza place usually covers all bases."
             });
