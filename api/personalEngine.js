@@ -62,7 +62,7 @@ CRITICAL RULES:
 3. FORMAT: Provide exactly one specific recommendation, returned ONLY as a valid JSON object matching this schema:
 { "foodName": "Crispy Tofu Tacos", "explanation": "A punchy 1-sentence hype explanation exactly why it fits them." }`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
