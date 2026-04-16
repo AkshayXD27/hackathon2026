@@ -24,8 +24,8 @@ module.exports = async function handler(req, res) {
     const { prompt, membersMap } = req.body;
     if (!prompt) return res.status(400).json({ error: "No prompt provided" });
 
-    const apiKey = process.env.AI_KEY;
-    if (!apiKey) return res.status(500).json({ error: "AI key not configured" });
+    const apiKey = process.env.GOOGLE_KEY;
+    if (!apiKey) return res.status(500).json({ error: "Google AI key not configured" });
     const uri = process.env.MONGODB_URI;
 
     let recentFoodsContext = "";
@@ -64,57 +64,35 @@ CRITICAL RULES:
 RECENT FOODS FROM GROUP:
 ${recentFoodsContext || "No recent foods logged."}`;
 
-    const modelsToTry = [
-        "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-        "minimax/minimax-m2.5:free",
-        "meta-llama/llama-3.3-70b-instruct:free",
-        "qwen/qwen3-coder:free",
-        "z-ai/glm-4.5-air:free"
-    ];
-
-    let result = null;
-    let lastError = null;
-
-    for (const model of modelsToTry) {
-        try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                "model": model,
-                "temperature": 0.8,
-                "messages": [
-                  { "role": "system", "content": systemPrompt },
-                  { "role": "user", "content": prompt }
-                ]
-              })
-            });
-
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`Model ${model} failed with ${response.status}: ${errText}`);
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            systemInstruction: {
+                parts: [{ text: systemPrompt }]
+            },
+            contents: [{
+                parts: [{ text: prompt }]
+            }],
+            generationConfig: {
+                temperature: 0.8,
+                responseMimeType: "application/json"
             }
+        })
+    });
 
-            result = await response.json();
-            break; // Engine success, exit fallback loop
-        } catch (e) {
-            console.warn(`Engine Fallback Triggered: ${e.message}`);
-            lastError = e;
-            continue;
-        }
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Google API failed with ${response.status}: ${errText}`);
     }
 
-    if (!result) {
-        throw new Error(`OpenRouter API utterly failed after exhausting 5 fallbacks. Last error: ${lastError?.message}`);
-    }
-    let aiText = result.choices[0].message.content;
+    const result = await response.json();
+    let aiText = result.candidates[0].content.parts[0].text;
     let verdict = {};
     
     try {
-        // Strip codeblocks if model hallucinated them
         aiText = aiText.replace(/```json/g, "").replace(/```/g, "").trim();
         verdict = JSON.parse(aiText);
     } catch(e) {
