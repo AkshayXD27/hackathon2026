@@ -75,21 +75,27 @@ CRITICAL RULES:
 
     for (const model of modelsToTry) {
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000);
+
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
               method: "POST",
               headers: {
                 "Authorization": `Bearer ${apiKey}`,
                 "Content-Type": "application/json"
               },
+              signal: controller.signal,
               body: JSON.stringify({
                 "model": model,
                 "temperature": 0.9,
+                "max_tokens": 150,
                 "messages": [
                   { "role": "system", "content": systemPrompt },
                   { "role": "user", "content": `Surprise me! Make it wildly different from any past suggestion. Random seed: ${Date.now()}` }
                 ]
               })
             });
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
                 const errText = await response.text();
