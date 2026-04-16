@@ -9,17 +9,29 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentSessionPin = null;
     let isHost = false;
     let sessionUnsubscribe = null;
+    let globalBudget = null;
+    let globalCurrency = "$";
 
     // DOM Elements
     const sWelcome = document.getElementById('welcome-section');
+    const sPersonalDashboard = document.getElementById('personal-dashboard-section');
     const sLobby = document.getElementById('lobby-section');
     const sInput = document.getElementById('input-section');
     const sCalculating = document.getElementById('calculating-section');
     const sResult = document.getElementById('result-section');
 
-    const welcomeMsg = document.getElementById('welcome-message');
+    const welcomeMsg = document.getElementById('pd-welcome-message');
     const dashboardContent = document.getElementById('dashboard-content');
     const loadingSpinner = document.getElementById('loading-spinner');
+
+    const budgetPill = document.getElementById('budget-pill');
+    const budgetInput = document.getElementById('budget-input');
+    const btnSaveBudget = document.getElementById('btn-save-budget');
+    const userCurrency = document.getElementById('user-currency');
+    const foodInput = document.getElementById('food-input');
+    const foodDay = document.getElementById('food-day');
+    const btnLogFood = document.getElementById('btn-log-food');
+    const foodList = document.getElementById('food-list');
 
     // Auth & Init
     document.getElementById('logout-btn')?.addEventListener('click', async () => {
@@ -40,7 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 loadingSpinner.style.display = 'none';
                 dashboardContent.style.display = 'flex';
-                showSection(sWelcome);
+                showSection(sPersonalDashboard);
+                fetchFoods();
             } else {
                 window.location.href = 'index.html';
             }
@@ -53,12 +66,94 @@ document.addEventListener("DOMContentLoaded", () => {
     // View Routing
     function showSection(targetSection) {
         sWelcome.style.display = 'none';
+        sPersonalDashboard.style.display = 'none';
         sLobby.style.display = 'none';
         sInput.style.display = 'none';
         sCalculating.style.display = 'none';
         sResult.style.display = 'none';
         targetSection.style.display = 'block';
     }
+
+    // Budget Controller
+    budgetPill.addEventListener('click', () => {
+        budgetPill.style.display = 'none';
+        budgetInput.style.display = 'inline-block';
+        btnSaveBudget.style.display = 'inline-block';
+        budgetInput.focus();
+    });
+
+    btnSaveBudget.addEventListener('click', () => {
+        const val = budgetInput.value.trim();
+        if(val) {
+            globalBudget = val;
+            globalCurrency = userCurrency.value;
+            budgetPill.textContent = "Budget: " + globalCurrency + globalBudget;
+            budgetPill.style.background = "rgba(46, 204, 113, 0.1)";
+            budgetPill.style.color = "#2ecc71";
+            budgetPill.style.border = "1.5px solid rgba(46, 204, 113, 0.5)";
+        }
+        budgetPill.style.display = 'inline-block';
+        budgetInput.style.display = 'none';
+        btnSaveBudget.style.display = 'none';
+    });
+
+    userCurrency.addEventListener('change', () => {
+        if(globalBudget) {
+            globalCurrency = userCurrency.value;
+            budgetPill.textContent = "Budget: " + globalCurrency + globalBudget;
+        }
+    });
+
+    // Personal Dashboard Food Logging
+    async function fetchFoods() {
+        if (!currentUser) return;
+        try {
+            const res = await fetch(`/api/getFoods?uid=${currentUser.uid}`);
+            const data = await res.json();
+            foodList.innerHTML = "";
+            if (data.success && data.logs.length > 0) {
+                data.logs.forEach(log => {
+                    const li = document.createElement('li');
+                    li.className = 'member-item';
+                    const dateDesc = log.date_unix > (Date.now()/1000 - 86400) ? "Today" : "Yesterday";
+                    li.innerHTML = `<span>${log.food}</span> <span class="status">${dateDesc}</span>`;
+                    foodList.appendChild(li);
+                });
+            } else {
+                foodList.innerHTML = `<p style="color: var(--text-gray);">No foods logged yet.</p>`;
+            }
+        } catch (e) {
+            console.error("Fetch Foods Error:", e);
+            foodList.innerHTML = `<p class="error-msg" style="display:block;">Error loading recent foods.</p>`;
+        }
+    }
+
+    btnLogFood.addEventListener('click', async () => {
+        const food = foodInput.value.trim();
+        if (!food) return;
+
+        btnLogFood.disabled = true;
+        btnLogFood.innerText = "Saving...";
+        try {
+            const res = await fetch('/api/logFood', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ uid: currentUser.uid, food: food, dayOffset: foodDay.value })
+            });
+            const result = await res.json();
+            if (result.success) {
+                foodInput.value = "";
+                await fetchFoods();
+            } else {
+                alert("Error logging food: " + result.error);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Network error.");
+        }
+        btnLogFood.disabled = false;
+        btnLogFood.innerText = "Log Food";
+    });
 
     // 1. Create Group
     document.getElementById('btn-create-group').addEventListener('click', async () => {
@@ -202,7 +297,12 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.disabled = true;
 
         const cravings = document.getElementById('craving-input').value || "Surprise me!";
-        const budget = document.querySelector('input[name="budget"]:checked').value;
+        
+        // Respect global budget if set, otherwise fallback to the radio selector
+        let budget = document.querySelector('input[name="budget"]:checked') ? document.querySelector('input[name="budget"]:checked').value : "Budget";
+        if (globalBudget) {
+            budget = `${globalCurrency}${globalBudget}`;
+        }
 
         const sessionRef = doc(db, "sessions", currentSessionPin);
 
@@ -237,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
         isHost = false;
         document.getElementById('join-form').style.display = 'none';
         document.getElementById('pin-input').value = "";
-        showSection(sWelcome);
+        showSection(sPersonalDashboard);
     });
 
     // Engine: Trigger Eatzy Engine (Called only by host) via secure Vercel backend
