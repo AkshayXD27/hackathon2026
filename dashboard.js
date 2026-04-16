@@ -2,7 +2,7 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-const VENICE_API_KEY = "VENICE_INFERENCE_KEY_AGVLhdHxqCuexbWYQ4YwF11cFubWpI91m8Eu1YY7XX";
+const AI_API_KEY = "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";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Top Level State
@@ -256,15 +256,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             prompt += "\nSelect exactly one meal idea/cuisine. Deliver the final verdict directly.";
 
-            // 3. Make API Call to Venice
-            const response = await fetch("https://api.venice.ai/api/v1/chat/completions", {
+            // 3. Make API Call natively compatible with OpenRouter given the sk-or-v1 key format
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${VENICE_API_KEY}`,
-                    "Content-Type": "application/json"
+                    "Authorization": `Bearer ${AI_API_KEY}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": window.location.href, // Required by OpenRouter
+                    "X-Title": "Eatzy App"
                 },
                 body: JSON.stringify({
-                    model: "venice-uncensored",
+                    model: "openrouter/auto",
                     messages: [
                         { role: "system", content: "You are the Eatzy engine. Return only the final restaurant/cuisine recommendation." },
                         { role: "user", content: prompt }
