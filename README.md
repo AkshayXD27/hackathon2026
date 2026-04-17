@@ -4,6 +4,8 @@
 
 This project was built as part of a CodeZenith hackathon (DSCASC).
 
+**TO access the website visit this link** https://hackathon2026-pi.vercel.app/
+
 ##  Features
 
 * 🔐 User Authentication (Login / Signup)
