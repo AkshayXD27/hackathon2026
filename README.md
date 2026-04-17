@@ -1,5 +1,6 @@
 # CodeZenith Hackathon 2026 Project
-
+(Status: not won
+FIrst hackathon first loss)
 ##  Overview
 
 This project was built as part of a CodeZenith hackathon (DSCASC).
