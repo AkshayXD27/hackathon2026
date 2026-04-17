@@ -1,6 +1,30 @@
 import { auth, db } from './firebase-config.js';
+
+// onAuthStateChnaged checks if the user is logged in using firebase auth
+
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+// If they are authenticated, it fetches their profile data from a Firestore users collection, sets up their preferred currency and budget, and dynamically renders their personal dashboard.
+
+/* Group engine It uses Firestore's real-time listeners (onSnapshot) to create a synchronized multiplayer room where friends can agree on what to eat.Lobby (state: "lobby"): * The Host clicks "Create Group," which generates a 4-digit PIN and creates a new sessions document in the database.
+
+Guests enter the PIN to join. The DOM dynamically updates to show a live list of everyone in the room.
+
+Input (state: "input"):
+
+The Host starts the engine. A 60-second timer begins ticking down locally.
+
+Users type in their current craving and budget. Clicking "Lock In" saves their preferences to the shared session document.
+
+Calculating (state: "calculating"):
+
+Once the database detects that the number of locked-in inputs matches the number of members, the Host's client automatically advances the state.
+
+The UI switches to a loading screen for everyone.
+
+Then we constructs a prompt combining everyone's usernames, dietary restrictions, allergies, and current cravings, then fires a POST request to the backend LLM
+
+*/
 
 document.addEventListener("DOMContentLoaded", () => {
     // Top Level State
