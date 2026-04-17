@@ -3,7 +3,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "", // pretty much safe to expose
+  apiKey: "AIzaSyDUbpV2ar-GS66Ikp1PJR0quAPJdH2Byow", // pretty much safe to expose
   authDomain: "hackathon-20261.firebaseapp.com",
   projectId: "hackathon-20261",
   storageBucket: "hackathon-20261.firebasestorage.app",
