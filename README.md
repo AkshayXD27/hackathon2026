@@ -23,7 +23,7 @@ This project was built as part of a CodeZenith hackathon (DSCASC).
 * **Backend:** Firebase
 * **Database:** Firestore / MONGO DB
 * **Authentication:** Firebase Auth
-* **AI Integration:** 4 API-based models
+* **AI Integration:** 4 API-based models (currently using only one **elephant-alpha model** for faster results)
 
 ---
 
