@@ -18,7 +18,8 @@ This project was built as part of a CodeZenith hackathon (DSCASC).
 ---
 
 ## Tech Stack
-
+* **IDE:** Anitgravity , zed
+* **Ai agents used** Gemini 3.1 Pro , Gamma
 * **Frontend:** HTML, CSS, JavaScript
 * **Backend:** Firebase
 * **Database:** Firestore / MONGO DB
